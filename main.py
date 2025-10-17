@@ -328,7 +328,7 @@ async def giveaway(interaction: discord.Interaction, prize: str, duration: int, 
 async def delete_giveaway(interaction: discord.Interaction, message_id: str):
     """Supprime un message de giveaway en fonction de son ID."""
     
-    # Vérification des permissions
+    
     if not interaction.user.guild_permissions.administrator:
         return await interaction.response.send_message(
             "[-] Seuls les administrateurs peuvent utiliser cette commande.",
@@ -336,13 +336,10 @@ async def delete_giveaway(interaction: discord.Interaction, message_id: str):
         )
 
     try:
-        # Tentative de conversion de l’ID en entier
         message_id_int = int(message_id)
 
-        # Récupération du message
         giveaway_message = await interaction.channel.fetch_message(message_id_int)
 
-        # Suppression du message
         await giveaway_message.delete()
         await interaction.response.send_message(
             "**[+] Giveaway supprimé avec succès !**",
