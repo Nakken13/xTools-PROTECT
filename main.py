@@ -317,26 +317,61 @@ async def giveaway(interaction: discord.Interaction, prize: str, duration: int, 
 
 
 
-@tree.command(name="delete_giveaway", description="Supprimer un giveaway en cours dans le salon actuel. (Administrateur uniquement)")
+
+@tree.command(
+    name="delete_giveaway",
+    description="Supprimer un giveaway en cours dans le salon actuel. (Administrateur uniquement)"
+)
 @app_commands.describe(
     message_id="L'ID du message du giveaway à supprimer"
 )
-async def delete_giveaway(interaction: discord.Interaction, message_id):
+async def delete_giveaway(interaction: discord.Interaction, message_id: str):
+    """Supprime un message de giveaway en fonction de son ID."""
+    
+    # Vérification des permissions
     if not interaction.user.guild_permissions.administrator:
-        await interaction.response.send_message("[-] Seuls les administrateurs peuvent utiliser cette commande.", ephemeral=True)
-        return
+        return await interaction.response.send_message(
+            "[-] Seuls les administrateurs peuvent utiliser cette commande.",
+            ephemeral=True
+        )
 
     try:
-        giveaway_message = await interaction.channel.fetch_message(message_id)
-        await giveaway_message.delete()
-        await interaction.response.send_message("**[+] Giveaway supprimé avec succès !**", ephemeral=True)
-    except discord.NotFound:
-        await interaction.response.send_message("[-] Message de giveaway non trouvé.", ephemeral=True)
-    except discord.Forbidden:
-        await interaction.response.send_message("[-] Je n'ai pas la permission de supprimer ce message.", ephemeral=True)
-    except Exception as e:
-        await interaction.response.send_message(f"[-] Une erreur est survenue : {str(e)}", ephemeral=True)
+        # Tentative de conversion de l’ID en entier
+        message_id_int = int(message_id)
 
+        # Récupération du message
+        giveaway_message = await interaction.channel.fetch_message(message_id_int)
+
+        # Suppression du message
+        await giveaway_message.delete()
+        await interaction.response.send_message(
+            "**[+] Giveaway supprimé avec succès !**",
+            ephemeral=True
+        )
+
+    except ValueError:
+        await interaction.response.send_message(
+            "[-] L'ID du message doit être un nombre valide.",
+            ephemeral=True
+        )
+
+    except discord.NotFound:
+        await interaction.response.send_message(
+            "[-] Message de giveaway non trouvé.",
+            ephemeral=True
+        )
+
+    except discord.Forbidden:
+        await interaction.response.send_message(
+            "[-] Je n'ai pas la permission de supprimer ce message.",
+            ephemeral=True
+        )
+
+    except Exception as e:
+        await interaction.response.send_message(
+            f"[-] Une erreur est survenue : `{e}`",
+            ephemeral=True
+        )
 
 @tree.command()
 @app_commands.describe()
